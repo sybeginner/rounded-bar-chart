@@ -62,7 +62,7 @@ export class AppComponent implements OnInit {
           top = vm.y;
           bottom = vm.base;
           signX = 1;
-          signY = bottom > top? 1: -1;
+          signY = bottom > top ? 1 : -1;
           borderSkipped = vm.borderSkipped || 'bottom';
         } else {
           // horizontal bar
@@ -70,7 +70,7 @@ export class AppComponent implements OnInit {
           right = vm.x;
           top = vm.y - vm.height / 2;
           bottom = vm.y + vm.height / 2;
-          signX = right > left? 1: -1;
+          signX = right > left ? 1 : -1;
           signY = 1;
           borderSkipped = vm.borderSkipped || 'left';
         }
@@ -80,13 +80,13 @@ export class AppComponent implements OnInit {
         if (borderWidth) {
           // borderWidth shold be less than bar width and bar height.
           const barSize = Math.min(Math.abs(left - right), Math.abs(top - bottom));
-          borderWidth = borderWidth > barSize? barSize: borderWidth;
+          borderWidth = borderWidth > barSize ? barSize : borderWidth;
           const halfStroke = borderWidth / 2;
           // Adjust borderWidth when bar top position is near vm.base(zero).
-          const borderLeft = left + (borderSkipped !== 'left'? halfStroke * signX: 0);
-          const borderRight = right + (borderSkipped !== 'right'? -halfStroke * signX: 0);
-          const borderTop = top + (borderSkipped !== 'top'? halfStroke * signY: 0);
-          const borderBottom = bottom + (borderSkipped !== 'bottom'? -halfStroke * signY: 0);
+          const borderLeft = left + (borderSkipped !== 'left' ? halfStroke * signX : 0);
+          const borderRight = right + (borderSkipped !== 'right' ? -halfStroke * signX : 0);
+          const borderTop = top + (borderSkipped !== 'top' ? halfStroke * signY : 0);
+          const borderBottom = bottom + (borderSkipped !== 'bottom' ? -halfStroke * signY : 0);
           // not become a vertical line?
           if (borderLeft !== borderRight) {
             top = borderTop;
@@ -149,14 +149,24 @@ export class AppComponent implements OnInit {
     this.myChart = new Chart('roundedBarChart', {
       type: 'roundedBar',
       data: {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange', '1', '2', '3', '4', '5', '6'],
-        datasets: [{
-          label: '# of Votes',
-          data: [3, 2, 4, 3, 6, 3, -3, 6, -1, -6, 5, 8],
-          borderWidth: 0,
-          // barThickness: 'flex',
-          barPercentage: 0.5,
-        },
+        labels: ['Apr 2019', 'May 2019', 'Jun 2019', 'Jul 2019', 'Aug 2019', 'Sep 2019',
+          'Oct 2019', 'Nov 2019', 'Dec 2019', 'Jan 2020', 'Feb 2020', 'Mar 2020'],
+        datasets: [
+          {
+            label: 'Label',
+            data: [3, 2, 4, 3, 6, 3, -3, 6, -1, -6, 5, 8],
+            borderWidth: 0,
+            // barThickness: 'flex',
+            barPercentage: 0.5,
+          },
+          {
+            label: 'line at the ends',
+            data: [12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12],
+            type: 'bar',
+            barThickness: 2,
+            borderWidth: 0,
+            backgroundColor: '#0086fb',
+          }
         ]
       },
       options: {
@@ -174,17 +184,29 @@ export class AppComponent implements OnInit {
             },
           }],
           xAxes: [{
+            position: 'top',
             ticks: {
-              display: false,
+              callback: (item, index) => {
+                if (index === 0) {
+                  return item;
+                }
+                if (index === 10) {
+                  return 'Today';
+                }
+              },
+              fontSize: 15,
+              display: true,
+              padding: -40,
+              labelOffset: 45,
             },
             gridLines: {
               display: false,
-            }
+            },
           }]
         },
         legend: {
           display: false,
-        }
+        },
       }
     });
   }
