@@ -23,20 +23,40 @@ export class AppComponent implements OnInit {
     const gradient = this.createGradient(context);
 
     Chart.helpers.drawRoundedTopRectangle = (ctx, x, y, width, height, radius) => {
-      console.log('drawing rounded top?');
-      ctx.beginPath();
-      ctx.moveTo(x + radius, y);
-      // top right corner
-      ctx.lineTo(x + width - radius, y);
-      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-      // bottom right corner
-      ctx.lineTo(x + width, y + height);
-      // bottom left corner
-      ctx.lineTo(x, y + height);
-      // top left
-      ctx.lineTo(x, y + radius);
-      ctx.quadraticCurveTo(x, y, x + radius, y);
-      ctx.closePath();
+      console.log('x: ', x);
+      console.log('y: ',y);
+      console.log('width: ', width);
+      console.log('height: ', height);
+      console.log('radius: ', radius);
+      if (height >= 0) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        // top right corner
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        // bottom right corner
+        ctx.lineTo(x + width, y + height);
+        // bottom left corner
+        ctx.lineTo(x, y + height);
+        // top left
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        // bottom right corner
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y - radius);
+        // top right corner
+        ctx.lineTo(x + width, y + height);
+        // top left corner
+        ctx.lineTo(x, y + height);
+        // bottom left
+        ctx.lineTo(x, y - radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+      }
     };
 
     // @ts-ignore
@@ -46,6 +66,8 @@ export class AppComponent implements OnInit {
         const vm = this._view;
         let left, right, top, bottom, signX, signY, borderSkipped;
         let borderWidth = vm.borderWidth;
+
+        console.log('vm: ', vm);
 
         if (!vm.horizontal) {
           // bar
@@ -91,11 +113,6 @@ export class AppComponent implements OnInit {
           }
         }
 
-        console.log('left: ', left);
-        console.log('top: ', top);
-        console.log('right: ', right);
-        console.log('bottom: ', bottom);
-
         // calculate the bar width and roundess
         const barWidth = Math.abs(left - right);
         const roundness = this._chart.config.options.barRoundness || 0.5;
@@ -108,15 +125,28 @@ export class AppComponent implements OnInit {
         top = prevTop + radius;
         const barRadius = top - prevTop;
 
+        // console.log('left: ', left);
+        // console.log('top: ', prevTop);
+        // console.log('right: ', right);
+        // console.log('bottom: ', bottom);
+        //
+        // console.log('bottom - top: ', bottom - top);
+        const gdt = ctx.createLinearGradient(left, top, right, bottom);
+        if (top < bottom) {
+          gdt.addColorStop(0, '#0086fb');
+          gdt.addColorStop(1, '#50d3f2');
+        } else {
+          gdt.addColorStop(1, '#d1d1d1');
+          gdt.addColorStop(0, '#9e9e9e');
+        }
+
         ctx.beginPath();
-        ctx.fillStyle = vm.backgroundColor;
+        ctx.fillStyle = gdt;
         ctx.strokeStyle = vm.borderColor;
         ctx.lineWidth = borderWidth;
 
-        console.log('ctx: ', ctx);
-
         // draw the rounded top rectangle
-        Chart.helpers.drawRoundedTopRectangle(ctx, left, (top - barRadius + 1), barWidth, bottom - prevTop, barRadius);
+        Chart.helpers.drawRoundedTopRectangle(ctx, left, (top - barRadius), barWidth, bottom - prevTop, barRadius);
 
         ctx.fill();
         if (borderWidth) {
@@ -186,7 +216,7 @@ export class AppComponent implements OnInit {
         labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange', '1', '2', '3', '4', '5', '6'],
         datasets: [{
           label: '# of Votes',
-          data: [4, 2, 4, 3, 6, 3, -3, 6, -1, -6, 5, 8],
+          data: [3, 2, 1, 3, 6, 3, -3, 6, -1, -6, 5, 8],
           backgroundColor: gradient,
           borderColor: gradient,
           borderWidth: 0,
@@ -202,10 +232,25 @@ export class AppComponent implements OnInit {
         scales: {
           yAxes: [{
             ticks: {
-              beginAtZero: true
+              beginAtZero: true,
+              display: false,
+            },
+            gridLines: {
+              display: false,
+            },
+          }],
+          xAxes: [{
+            ticks: {
+              display: false,
+            },
+            gridLines: {
+              display: false,
             }
           }]
         },
+        legend: {
+          display: false,
+        }
       }
     });
 
